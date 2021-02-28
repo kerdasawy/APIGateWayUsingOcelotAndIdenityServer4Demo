@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Users;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +29,13 @@ namespace IdentityServer
         {
 
             services.AddControllers();
+            var builder = services.AddIdentityServer()
+            .AddInMemoryIdentityResources(Config.IdentityResources)
+            .AddInMemoryApiScopes(Config.ApiScopes)
+            .AddInMemoryClients(Config.Clients)
+            .AddTestUsers(TestUsers.Users);
+
+            builder.AddDeveloperSigningCredential();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "IdentityServer", Version = "v1" });
@@ -45,9 +53,9 @@ namespace IdentityServer
             }
 
             app.UseHttpsRedirection();
-
-            app.UseRouting();
-
+            app.UseStaticFiles();
+            app.UseRouting();  
+            app.UseIdentityServer();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
