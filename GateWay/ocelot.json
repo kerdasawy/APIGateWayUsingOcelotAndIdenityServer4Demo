@@ -11,7 +11,11 @@
       ],
       "UpstreamPathTemplate": "/WeatherForecastA/",
       "UpstreamHttpMethod": [ "Get" ],
-      "Key": "SA"
+      "Key": "SA",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IS",
+        "AllowedScopes": [ "api1" ]
+      }
     },
     {
       "DownstreamPathTemplate": "/WeatherForecast/",
@@ -24,7 +28,11 @@
       ],
       "UpstreamPathTemplate": "/WeatherForecastB/",
       "UpstreamHttpMethod": [ "Get" ],
-      "Key": "SB"
+      "Key": "SB",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IS",
+        "AllowedScopes": [ "api1" ]
+      }
     }
   ],
   "Aggregates": [
@@ -33,8 +41,11 @@
         "SA",
         "SB"
       ],
-      "UpstreamPathTemplate": "/WeatherForecast/"
-      
+      "UpstreamPathTemplate": "/WeatherForecast/",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IS",
+        "AllowedScopes": [ "api1" ]
+      }
     }
   ],
   "GlobalConfiguration": {

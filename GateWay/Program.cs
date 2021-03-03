@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -71,15 +72,53 @@ namespace GateWay
                  //    };
                  //    // etc....
                  //};
+                 var authenticationProviderKey = "IS";
+                 Action<JwtBearerOptions> options = o =>
+                 {
+                     o.Authority = "http://localhost:5000";
+                     o.RequireHttpsMetadata = false;
+                     
+                     //o.ClientId = "client";
+                     //o.ClientSecret = new Secret("secret".Sha256());
+                     //o.ResponseType = "code";
+
+                     //options.Scope.Add("api1");
+                     // etc
+                 };
+
+                 s.AddAuthentication()
+                  .AddJwtBearer(authenticationProviderKey, options =>
+                  {
+                      options.Authority = "http://localhost:5000";
+                      options.RequireHttpsMetadata = false;
+                      options.TokenValidationParameters = new TokenValidationParameters
+                      {
+                          ValidateAudience = false
+                      };
+                  });
+                 // adds an authorization policy to make sure the token is for scope 'api1'
+                 s.AddAuthorization(options =>
+                 {
+                     options.AddPolicy("ApiScope", policy =>
+                     {
+                         policy.RequireAuthenticatedUser();
+                         policy.RequireClaim("scope", "api1");
+                     });
+                 });
+                 //.AddJwtBearer(authenticationProviderKey, options);
 
                  s.AddOcelot()
                 // .AddAdministration("/administration", "secret")
                 ;
                  s.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
              })
-                .Configure(a =>
+                .Configure(app =>
                 {
-                    a.UseOcelot().Wait();
+
+                     
+                    app.UseAuthentication();
+                    
+                    app.UseOcelot().Wait();
                 });
     }
     public class FooAgger : IDefinedAggregator

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
  
@@ -15,7 +16,7 @@ namespace IdentityServer
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -34,7 +35,41 @@ namespace IdentityServer
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
                 .CreateLogger();
             Log.Information("Starting host...");
-            CreateHostBuilder(args).Build().Run();
+            try
+            {
+                //var seed = args.Contains("/seed");
+                var seed = false;
+                //if (seed)
+                //{
+                //    args = args.Except(new[] { "/seed" }).ToArray();
+                //}
+
+                var host = CreateHostBuilder(args).Build();
+
+                if (seed)
+                {
+                    Log.Information("Seeding database...");
+                    var config = host.Services.GetRequiredService<IConfiguration>();
+                    var connectionString = config.GetConnectionString("DefaultConnection");
+                    SeedData.EnsureSeedData(connectionString);
+                    Log.Information("Done seeding database.");
+                    return 0;
+                }
+
+                Log.Information("Starting host...");
+                host.Run();
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly.");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+       //     CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
