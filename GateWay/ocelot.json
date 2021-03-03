@@ -1,0 +1,46 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/WeatherForecast/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 3000
+        }
+      ],
+      "UpstreamPathTemplate": "/WeatherForecastA/",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "SA"
+    },
+    {
+      "DownstreamPathTemplate": "/WeatherForecast/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 3500
+        }
+      ],
+      "UpstreamPathTemplate": "/WeatherForecastB/",
+      "UpstreamHttpMethod": [ "Get" ],
+      "Key": "SB"
+    }
+  ],
+  "Aggregates": [
+    {
+      "RouteKeys": [
+        "SA",
+        "SB"
+      ],
+      "UpstreamPathTemplate": "/WeatherForecast/"
+      
+    }
+  ],
+  "GlobalConfiguration": {
+
+    "GlobalConfiguration": {
+      "BaseUrl": "http://localhost:4000"
+    }
+  }
+}
